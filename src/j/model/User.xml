@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="j.dao.UserDao">
+
+	<insert id="add" parameterType="User">
+		insert into
+		t_user(username,password,email,nickname,isactive)
+		value(#{username},#{password},#{email},#{nickname},#{isactive})
+	</insert>
+
+	<select id="queryAll" resultType="User">
+		select * from t_user
+  </select>
+
+	<select id="queryById" parameterType="int" resultType="User">
+		select *
+		from t_user where id=#{id}
+  </select>
+
+	<update id="update" parameterType="User">
+		update t_user set
+		username=#{username} ,
+		password=#{password},nickname=#{nickname},email=#{email}
+		,isactive=#{isactive} where id=#{id}
+  </update>
+
+	<delete id="delete" parameterType="int">
+		delete from t_user where
+		id=#{id}
+  </delete>
+  
+  <select id="getAllRowCount"  resultType="int">
+        select count(*) from  t_user where isactive = 1
+  </select>
+  
+  
+  <resultMap type="User" id="userfromheadUserTableResultMap">
+      <id column="id" property="id"/>
+      <result column="username" property="username"/>
+      <result column="password" property="password"/>
+      <result column="email" property="email"/>
+      <result column="nickname" property="nickname"/>
+      <result column="isactive" property="isactive"/>
+      <collection property="headUsers" ofType="HeadUser">
+         <id column="huuid" property="hu_uid"/>
+         <result column="huhid" property="hu_hid"/>
+      </collection>
+  </resultMap>
+  
+  <select id="selectUserfromheadUserTable" resultMap="userfromheadUserTableResultMap">
+     select u.* from t_user u , head_user_table ut
+     where u.id = ut.hu_uid
+  </select>
+  
+  
+  
+<!-- ////////////////////////////////////////////////////////////////////////////////////// -->
+	<!-- 搞个批量新增试试 -->
+	<insert id="bacthinsert" useGeneratedKeys="true" parameterType="java.util.List">
+		insert into t_user(username,password,email,nickname,isactive)
+		value
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.username},#{item.password},#{item.email},#{item.nickname},#{item.isactive})
+		</foreach>
+	</insert>
+
+	<!-- 批量删除 -->
+	<delete id="bacthdelete" parameterType="java.util.List">
+		delete from t_user where id in
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			(#{item})
+       </foreach>
+	</delete>
+
+	<!-- 批量更新 -->
+<update id="batchupdates"  parameterType="java.util.List">  
+    <foreach collection="list" item="item" index="index" separator=";">
+       update t_user
+       <set >
+          <if test="item.username != null" >
+            username = #{item.username,jdbcType=VARCHAR},
+          </if>
+        </set>
+        where id = #{item.id,jdbcType=INTEGER}
+    </foreach>       
+</update> 
+
+
+
+</mapper>

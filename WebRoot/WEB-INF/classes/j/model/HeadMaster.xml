@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="j.dao.HeadMasterDao">
+
+	
+  
+  <resultMap type="HeadMaster" id="headMasterfromheadUserTableResultMap">
+      <id column="hid" property="hid"/>
+      <result column="hname" property="hname"/>
+      <result column="pass" property="pass"/>
+      <result column="isactive" property="isactive"/>
+      <collection property="headUsers" ofType="HeadUser">
+         <id column="huhid" property="hu_hid"/>
+         <result column="huuid" property="hu_uid"/>
+      </collection>
+  </resultMap>
+  
+  <select id="selectHeadMasterfromheadUserTable" resultMap="headMasterfromheadUserTableResultMap">
+    select h.* from t_headmaster h , head_user_table ht
+    where h.hid = ht.hu_hid
+  </select>
+  
+  
+  
+  
+
+</mapper>
